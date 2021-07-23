@@ -94,8 +94,16 @@ class BertTrainer(object):
                 train_features = convert_examples_to_features_long(
                     self.train_examples, self.args.max_seq_length, self.tokenizer,'reformer')
             else:
-                train_features = convert_examples_to_features(
-                    self.train_examples, self.args.max_seq_length, self.tokenizer)
+                cached_features_file = os.path.join(self.args.data_dir, 'cached_train_{}_{}'.format(
+                    self.args.model, str(self.args.max_seq_length)))
+                if os.path.exists(cached_features_file):
+                    print("Loading features from cached file %s" % cached_features_file)
+                    train_features = torch.load(cached_features_file)
+                else:
+                    train_features = convert_examples_to_features(
+                        self.train_examples, self.args.max_seq_length, self.tokenizer)
+                    print("Saving features into cached file %s" % cached_features_file)
+                    torch.save(train_features, cached_features_file)
 
         unpadded_input_ids = [f.input_ids for f in train_features]
         unpadded_input_mask = [f.input_mask for f in train_features]

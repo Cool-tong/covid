@@ -43,8 +43,16 @@ class BertEvaluator(object):
                 eval_features = convert_examples_to_features_long(
                     self.eval_examples, self.args.max_seq_length, self.tokenizer,'reformer')
             else:
-                eval_features = convert_examples_to_features(
-                    self.eval_examples, self.args.max_seq_length, self.tokenizer)
+                cached_features_file = os.path.join(self.args.data_dir, 'cached_eval_{}_{}'.format(
+                    self.args.model, str(self.args.max_seq_length)))
+                if os.path.exists(cached_features_file):
+                    print("Loading features from cached file %s" % cached_features_file)
+                    eval_features = torch.load(cached_features_file)
+                else:
+                    eval_features = convert_examples_to_features(
+                        self.eval_examples, self.args.max_seq_length, self.tokenizer)
+                    print("Saving features into cached file %s" % cached_features_file)
+                    torch.save(eval_features, cached_features_file)
 
         unpadded_input_ids = [f.input_ids for f in eval_features]
         unpadded_input_mask = [f.input_mask for f in eval_features]

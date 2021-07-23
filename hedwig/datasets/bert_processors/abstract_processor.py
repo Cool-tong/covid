@@ -116,6 +116,7 @@ def convert_examples_to_features(examples, max_seq_length, tokenizer, print_exam
     """
 
     features = []
+    print("Writing %d examples" % len(examples))
     for (ex_index, example) in enumerate(examples):
         #Replacing new lines with [SEP] tokens
         text_a = example.text_a.replace('\\n','[SEP]')
