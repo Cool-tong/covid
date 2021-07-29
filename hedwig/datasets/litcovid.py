@@ -56,7 +56,7 @@ def process_labels(string):
 
 class LitCovid(TabularDataset):
     NAME = 'LitCovid'
-    NUM_CLASSES = 8
+    NUM_CLASSES = 7
     IS_MULTILABEL = True
 
     TEXT_FIELD = Field(batch_first=True, tokenize=clean_string, include_lengths=True)

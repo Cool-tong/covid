@@ -13,7 +13,7 @@ from datasets.bert_processors.abstract_processor import BertProcessor, InputExam
 
 class LitCovidProcessor(BertProcessor):
     NAME = 'LitCovid'
-    NUM_CLASSES = 8
+    NUM_CLASSES = 7
     IS_MULTILABEL = True
     
     def get_train_examples(self, data_dir, filename='train.tsv'):
