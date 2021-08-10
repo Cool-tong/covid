@@ -150,5 +150,5 @@ if __name__ == '__main__':
         print(args)
 
     evaluate_split(model, processor, tokenizer, args, split='dev')
-    evaluate_split(model, processor, tokenizer, args, split='test')
+    # evaluate_split(model, processor, tokenizer, args, split='test')
 

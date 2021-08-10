@@ -77,6 +77,7 @@ class BertEvaluator(object):
         total_loss = 0
         nb_eval_steps, nb_eval_examples = 0, 0
         predicted_labels, target_labels = list(), list()
+        sigmoid_logits = list()
 
         for input_ids, input_mask, segment_ids, label_ids in tqdm(eval_dataloader, desc="Evaluating", disable=silent):
             input_ids = input_ids.to(self.args.device)
@@ -88,6 +89,7 @@ class BertEvaluator(object):
                 logits = self.model(input_ids, input_mask, segment_ids)[0]
 
             if self.args.is_multilabel:
+                sigmoid_logits.extend(F.sigmoid(logits).cpu().detach().numpy())
                 predicted_labels.extend(F.sigmoid(logits).round().long().cpu().detach().numpy())
                 target_labels.extend(label_ids.cpu().detach().numpy())
                 loss = F.binary_cross_entropy_with_logits(logits, label_ids.float(), size_average=False)
@@ -106,6 +108,14 @@ class BertEvaluator(object):
             nb_eval_steps += 1
 
         predicted_labels, target_labels = np.array(predicted_labels), np.array(target_labels)
+        sigmoid_logits = np.array(sigmoid_logits)
+        with open("sigmoid_logits.txt", "w", encoding="utf-8") as ff:
+
+            np.set_printoptions(threshold=np.inf, suppress=True)  # 全部输出，不使用科学计数法
+            np.set_printoptions(linewidth=np.inf)  # 不换行
+            for i in sigmoid_logits:
+                print(i, file=ff)
+
 
         if self.dump_predictions:
             pickle.dump((predicted_labels, target_labels),open(os.path.join(self.args.data_dir,self.args.dataset,'{}_{}_{}_{}_predictions.p'.format(self.split,self.args.model,self.args.training_file,self.args.max_seq_length)),'wb'))
